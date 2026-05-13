@@ -22,10 +22,6 @@ protected:
 
 public:
     enable_shared_ptr() : _strong_reference_count(1) {}
-
-    std::uint64_t use_count() const noexcept {
-        return _strong_reference_count.load();
-    }
 };
 
 
@@ -38,7 +34,7 @@ static_assert(
 );
 
 friend class enable_shared_ptr;
-template<typename T2> friend class shared_ptr;
+
 
 protected:
     T* _ptr;
@@ -58,14 +54,7 @@ public:
 
     shared_ptr(T* ptr) : _ptr(ptr) {}
 
-    // copy constructor (same type)
-    shared_ptr(const shared_ptr<T>& other) {
-        _ptr = other._ptr;
-        if (_ptr != nullptr)
-            (_ptr->_strong_reference_count)++;
-    }
-
-    // copy constructor (derived to base)
+    // copy constructor
     template<typename T2>
     shared_ptr(const shared_ptr<T2>& other) {
         static_assert(std::is_base_of<T, T2>::value, "Will not copy pointer of different types, unless from derived type to base type.");
