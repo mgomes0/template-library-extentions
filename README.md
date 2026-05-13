@@ -17,3 +17,18 @@ FetchContent_MakeAvailable(template-library-extensions)
 add_executable(my_app main.cpp)
 target_link_libraries(my_app PRIVATE tlex::tlex)
 ```
+
+
+## Testing
+
+```bash
+cmake -S . -B build -DTLEX_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build
+```
+
+oneliner
+
+```bash
+cmake -S . -B build -DTLEX_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build
+```
