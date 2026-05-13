@@ -20,5 +20,6 @@ function(tlex_add_test target)
 endfunction()
 
 # ── Test targets ──────────────────────────────────────────────────────────────
-tlex_add_test(vector_test    vector_test.cpp)
-tlex_add_test(unique_ptr_test unique_ptr_test.cpp)
+tlex_add_test(vector_test      vector_test.cpp)
+tlex_add_test(unique_ptr_test  unique_ptr_test.cpp)
+tlex_add_test(shared_ptr_test  shared_ptr_test.cpp)
