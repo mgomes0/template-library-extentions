@@ -1,4 +1,4 @@
-# Template Library Extensions
+# Standard Template Library eXtensions (STLX)
 
 The repository of template stuff that I've created more than once, so now it's here.
 

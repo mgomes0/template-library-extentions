@@ -6,14 +6,15 @@
 #include <utility>
 
 
-namespace tlex {
+namespace stlx {
 
-
-class enable_shared_ptr;
+/// forward declaration
+class instrument_for_shared_ptr;
 template<typename T> class shared_ptr;
 
 
-class enable_shared_ptr {
+/// declaration
+class instrument_for_shared_ptr {
 template<typename T> friend class shared_ptr;
 
 protected:
@@ -21,7 +22,11 @@ protected:
 //    std::atomic<std::uint64_t> _weak_reference_count;
 
 public:
-    enable_shared_ptr() : _strong_reference_count(1) {}
+    instrument_for_shared_ptr() : _strong_reference_count(1) {}
+
+    std::uint64_t use_count() const noexcept {
+        return _strong_reference_count.load();
+    }
 };
 
 
@@ -29,11 +34,9 @@ template<typename T>
 class shared_ptr {
 
 static_assert(
-    std::is_base_of<enable_shared_ptr, T>::value,
-    "Cannot use `tlex::shared_ptr<T>` unless `T` inherits from `tlex::enable_shared_ptr`"
+    std::is_base_of<instrument_for_shared_ptr, T>::value,
+    "Cannot use `tlex::shared_ptr<T>` unless `T` inherits from `tlex::instrument_for_shared_ptr`"
 );
-
-friend class enable_shared_ptr;
 
 
 protected:

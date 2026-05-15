@@ -2,7 +2,7 @@
 
 #include <utility>
 
-namespace tlex {
+namespace stlx {
 
 template <typename T>
 class unique_ptr {

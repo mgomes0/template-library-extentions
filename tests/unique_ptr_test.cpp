@@ -1,8 +1,7 @@
-#include <tlex/unique_ptr.hpp>
+#include <stlx/unique_ptr.hpp>
 
 #include <gtest/gtest.h>
 
-namespace tlex::test {
 
 TEST(UniquePtrTest, DefaultConstructedIsNull) {
     // tlex::unique_ptr<int> p;
@@ -17,5 +16,3 @@ TEST(UniquePtrTest, MakeUniqueReturnsValidPtr) {
     // EXPECT_EQ(*p, 7);
     GTEST_SKIP() << "Not yet implemented";
 }
-
-} // namespace tlex::test
