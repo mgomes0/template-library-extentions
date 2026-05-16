@@ -8,12 +8,12 @@
 
 namespace stlx {
 
-/// forward declaration
+/// forward declarations
 class instrument_for_shared_ptr;
 template<typename T> class shared_ptr;
 
 
-/// declaration
+/// declarations
 class instrument_for_shared_ptr {
 template<typename T> friend class shared_ptr;
 
@@ -24,9 +24,9 @@ protected:
 public:
     instrument_for_shared_ptr() : _strong_reference_count(1) {}
 
-    std::uint64_t use_count() const noexcept {
-        return _strong_reference_count.load();
-    }
+//    std::uint64_t use_count() const noexcept {
+//        return _strong_reference_count.load();
+//    }
 };
 
 
@@ -35,9 +35,8 @@ class shared_ptr {
 
 static_assert(
     std::is_base_of<instrument_for_shared_ptr, T>::value,
-    "Cannot use `tlex::shared_ptr<T>` unless `T` inherits from `tlex::instrument_for_shared_ptr`"
+    "Cannot use `stlx::shared_ptr<T>` unless `T` inherits from `stlx::instrument_for_shared_ptr`"
 );
-
 
 protected:
     T* _ptr;
@@ -60,7 +59,7 @@ public:
     // copy constructor
     template<typename T2>
     shared_ptr(const shared_ptr<T2>& other) {
-        static_assert(std::is_base_of<T, T2>::value, "Will not copy pointer of different types, unless from derived type to base type.");
+//        static_assert(std::is_base_of<T, T2>::value, "Will not copy pointer of different types, unless from derived type to base type.");
 
         _ptr = other._ptr;
         if (other._ptr != nullptr)
@@ -70,7 +69,7 @@ public:
     // copy assignment
     template<typename T2>
     shared_ptr& operator=(const shared_ptr<T2>& other) {
-        static_assert(std::is_base_of<T, T2>::value, "Will not copy-assign pointer of different types, unless from derived type to base type.");
+//        static_assert(std::is_base_of<T, T2>::value, "Will not copy-assign pointer of different types, unless from derived type to base type.");
 
         _cleanup();
         _ptr = other._ptr;
@@ -82,7 +81,7 @@ public:
     // move constructor
     template<typename T2>
     shared_ptr(shared_ptr<T2>&& dying_other) {
-        static_assert(std::is_base_of<T, T2>::value, "Will not move pointer of different types, unless from derived type to base type.");
+//        static_assert(std::is_base_of<T, T2>::value, "Will not move pointer of different types, unless from derived type to base type.");
 
         _ptr = dying_other._ptr;
         dying_other._ptr = nullptr;
@@ -91,7 +90,7 @@ public:
     // move assignement
     template<typename T2>
     shared_ptr& operator=(shared_ptr<T2>&& dying_other) {
-        static_assert(std::is_base_of<T, T2>::value, "Will not move-assign pointer of different types, unless from derived type to base type.");
+//        static_assert(std::is_base_of<T, T2>::value, "Will not move-assign pointer of different types, unless from derived type to base type.");
 
         _cleanup();
         _ptr = dying_other._ptr;
@@ -111,7 +110,26 @@ public:
     T& operator*() const {
         return *_ptr;
     }
+
+    T* get() const {
+        return _ptr;
+    }
+
+    std::uint64_t use_count() const noexcept {
+        return _ptr->_strong_reference_count;
+    }
 };
+
+
+template<typename T, typename U>
+bool operator==(const share_ptr<T>& lhs, const share_ptr<U>& rhs) noexcept {
+    return lhs.get() == rhs.get();
+}
+
+template<class T>
+bool operator==(const std::shared_ptr<T>& lhs, std::nullptr_t) noexcept {
+    return lhs.get() == nullptr;
+}
 
 
 template<typename T, typename ... Args>
