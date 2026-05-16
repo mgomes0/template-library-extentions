@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <stlx/shared_ptr.hpp>
 
 #include <gtest/gtest.h>
@@ -15,28 +17,38 @@ float other_value;
 
 TEST(SharedPtrTest, DefaultConstructedIsNull) {
     stlx::shared_ptr<Widget> p;
+    EXPECT_EQ(p.get(), nullptr);
     EXPECT_EQ(p, nullptr);
+    EXPECT_EQ(nullptr, p);
 }
 
-//TEST(SharedPtrTest, MakeSharedCreatesObject) {
-////    auto p = tlex::make_shared<Widget>(42);
-////    EXPECT_EQ(p->value, 42);
-////    EXPECT_EQ((*p).value, 42);
-//    GTEST_SKIP() << "Not yet implemented";
-//}
-//
-//TEST(SharedPtrTest, CopyIncreasesRefCount) {
-////    auto p1 = tlex::make_shared<Widget>(1);
-////    {
-////        tlex::shared_ptr<Widget> p2(p1);
-////        EXPECT_EQ(p1->use_count(), 2u);
-////    }
-////    // p2 destroyed — count back to 1, object still alive
-////    EXPECT_EQ(p1->use_count(), 1u);
-////    EXPECT_EQ(p1->value, 1);
-//    GTEST_SKIP() << "Not yet implemented";
-//}
-//
+
+TEST(SharedPtrTest, MakeSharedCreatesObject) {
+    auto p = stlx::make_shared<Widget>();
+    p->value = 42;
+    EXPECT_EQ(p->value, 42);
+    EXPECT_EQ((*p).value, 42);
+    EXPECT_NE(p, nullptr);
+
+    auto q = stlx::make_shared<Widget>();
+    EXPECT_NE(p, q);
+
+    EXPECT_EQ(p.use_count(), 1);
+    EXPECT_EQ(q.use_count(), 1);
+}
+
+
+TEST(SharedPtrTest, CopyIncreasesRefCount) {
+    auto p = stlx::make_shared<Widget>();
+    EXPECT_EQ(p.use_count(), 1);
+    {
+        stlx::shared_ptr<Widget> q(p);
+        EXPECT_EQ(q.use_count(), 2);
+    }
+    EXPECT_EQ(p.use_count(), 1);
+}
+
+
 //TEST(SharedPtrTest, MoveTransfersOwnership) {
 ////    auto p1 = tlex::make_shared<Widget>(7);
 ////    tlex::shared_ptr<Widget> p2(std::move(p1));
