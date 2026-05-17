@@ -80,6 +80,19 @@ TEST(SharedPtrTest, MoveTransfersOwnership) {
 }
 
 
+TEST(SharedPtrTest, DerivedToBaseConversion) {
+    DESTRUCTOR_CALLS = 0;
+    {
+        auto derived = stlx::make_shared<Gadget>();
+        derived->value = 42;
+        stlx::shared_ptr<Widget> base(derived);
+        EXPECT_EQ(base->value, 42);
+        EXPECT_EQ(derived.use_count(), 2);
+    }
+    EXPECT_EQ(DESTRUCTOR_CALLS, 1);
+}
+
+
 TEST(SharedPtrTest, DerivedToCopyAssignment) {
     DESTRUCTOR_CALLS = 0;
     {
