@@ -49,15 +49,17 @@ TEST(SharedPtrTest, CopyIncreasesRefCount) {
 }
 
 
-//TEST(SharedPtrTest, MoveTransfersOwnership) {
-////    auto p1 = tlex::make_shared<Widget>(7);
-////    tlex::shared_ptr<Widget> p2(std::move(p1));
-////    EXPECT_EQ(p1.operator->(), nullptr);  // NOLINT: testing moved-from state
-////    EXPECT_EQ(p2->value, 7);
-////    EXPECT_EQ(p2->use_count(), 1u);
-//    GTEST_SKIP() << "Not yet implemented";
-//}
-//
+TEST(SharedPtrTest, MoveTransfersOwnership) {
+    auto p = stlx::make_shared<Widget>();
+    EXPECT_NE(p, nullptr);
+
+    auto p_raw = p.get();
+    stlx::shared_ptr<Widget> q(std::move(p));
+    EXPECT_EQ(q.get(), p_raw);
+    EXPECT_EQ(p, nullptr);
+}
+
+
 //TEST(SharedPtrTest, DerivedToCopyAssignment) {
 ////    auto derived = tlex::make_shared<Gadget>(99);
 ////    tlex::shared_ptr<Widget> base;

@@ -67,8 +67,8 @@ public:
     }
 
     // copy assignment
-    template<typename T2>
-    shared_ptr& operator=(const shared_ptr<T2>& other) {
+//    template<typename T2>
+    shared_ptr& operator=(const shared_ptr& other) {
 //        static_assert(std::is_base_of<T, T2>::value, "Will not copy-assign pointer of different types, unless from derived type to base type.");
         std::cout << "COPY ASSINGMENT\n";
         _cleanup();
@@ -79,8 +79,8 @@ public:
     }
 
     // move constructor
-    template<typename T2>
-    shared_ptr(shared_ptr<T2>&& dying_other) {
+//    template<typename T2>
+    shared_ptr(shared_ptr&& dying_other) {
 //        static_assert(std::is_base_of<T, T2>::value, "Will not move pointer of different types, unless from derived type to base type.");
         std::cout << "MOVE CONSTRUCTOR\n";
         _ptr = dying_other._ptr;
@@ -88,8 +88,8 @@ public:
     }
 
     // move assignment
-    template<typename T2>
-    shared_ptr& operator=(shared_ptr<T2>&& dying_other) {
+//    template<typename T2>
+    shared_ptr& operator=(shared_ptr&& dying_other) {
 //        static_assert(std::is_base_of<T, T2>::value, "Will not move-assign pointer of different types, unless from derived type to base type.");
         std::cout << "MOVE ASSIGNMENT\n";
         _cleanup();
@@ -102,6 +102,11 @@ public:
     ~shared_ptr() {
         std::cout << "DESTRUCTOR\n";
         _cleanup();
+    }
+
+    template<typename U>
+    operator shared_ptr<U>() const {
+        return _ptr;
     }
 
     T* operator->() const {
@@ -122,27 +127,35 @@ public:
 };
 
 
-template<typename T, typename U>
-bool operator==(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) noexcept { return lhs.get() == rhs.get(); }
-
-template<typename T, typename U>
-bool operator!=(const shared_ptr<T>& lhs, const shared_ptr<U>& rhs) noexcept { return lhs.get() != rhs.get(); }
-
-template<typename T>
-bool operator==(const shared_ptr<T>& lhs, std::nullptr_t) noexcept { return lhs.get() == nullptr; }
-
-template<typename T>
-bool operator==(std::nullptr_t, const shared_ptr<T>& rhs) noexcept { return nullptr == rhs.get(); }
-
-template<typename T>
-bool operator!=(const shared_ptr<T>& lhs, std::nullptr_t) noexcept {
-    return lhs.get() != nullptr;
-}
-
-
 template<typename T, typename ... Args>
 shared_ptr<T> make_shared(Args&& ... args) {
     return new T(std::forward<Args>(args)...);
 }
+
+
+#define BINARY_OPERATOR(op)\
+    template<typename T>\
+    bool operator op(const shared_ptr<T>& lhs, const shared_ptr<T>& rhs) noexcept {\
+        return lhs.get() op rhs.get();\
+    }\
+    \
+    template<typename T>\
+    bool operator op(const shared_ptr<T>& lhs, std::nullptr_t) noexcept {\
+        return lhs.get() op nullptr;\
+    }\
+    \
+    template<typename T>\
+    bool operator op(std::nullptr_t, const shared_ptr<T>& rhs) noexcept {\
+        return nullptr op rhs.get();\
+    }
+
+BINARY_OPERATOR(==)
+BINARY_OPERATOR(!=)
+BINARY_OPERATOR(<=)
+BINARY_OPERATOR(< )
+BINARY_OPERATOR(>=)
+BINARY_OPERATOR(> )
+
+
 
 }  // namespace tlex
