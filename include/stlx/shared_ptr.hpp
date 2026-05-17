@@ -44,7 +44,7 @@ friend class shared_ptr;
 protected:
     T* _ptr;
 
-    inline void _cleanup() {
+    void _cleanup() {
         if (_ptr != nullptr) {
             (_ptr->_strong_reference_count)--;
             if (_ptr->_strong_reference_count == 0) {
@@ -76,9 +76,21 @@ public:
     }
 
     // -------- COPY ASSIGNMENT ----------------
+    shared_ptr& operator=(const shared_ptr& other) {
+        std::cout << "COPY ASSIGNMENT\n";
+        if (_ptr == other._ptr)
+            return *this;
+
+        _cleanup();
+        _ptr = other._ptr;
+        if (other._ptr != nullptr)
+            (other._ptr->_strong_reference_count)++;
+        return *this;
+    }
+
     template<typename U>
     shared_ptr& operator=(const shared_ptr<U>& other) {
-        std::cout << "COPY ASSIGNMENT\n";
+        std::cout << "COPY TEMPLATE ASSIGNMENT\n";
         _cleanup();
         _ptr = other._ptr;
         if (other._ptr != nullptr)
@@ -134,7 +146,10 @@ public:
     }
 
     std::uint64_t use_count() const noexcept {
-        return _ptr->_strong_reference_count;
+        if (_ptr)
+            return _ptr->_strong_reference_count.load();
+        else
+            return 0;
     }
 };
 
@@ -170,4 +185,4 @@ BINARY_OPERATOR(> )
 
 
 
-}  // namespace tlex
+}  // namespace stlx

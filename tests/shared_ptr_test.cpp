@@ -57,6 +57,7 @@ TEST(SharedPtrTest, CopyIncreasesRefCount) {
         EXPECT_EQ(p.use_count(), 1);
         {
             stlx::shared_ptr<Widget> q(p);
+            q = p;
             EXPECT_EQ(q.use_count(), 2);
         }
         EXPECT_EQ(p.use_count(), 1);
