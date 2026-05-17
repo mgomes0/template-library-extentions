@@ -38,6 +38,9 @@ static_assert(
     "Cannot use `stlx::shared_ptr<T>` unless `T` inherits from `stlx::instrument_for_shared_ptr`"
 );
 
+template<typename U>
+friend class shared_ptr;
+
 protected:
     T* _ptr;
 
@@ -56,21 +59,26 @@ public:
 
     shared_ptr(T* ptr) : _ptr(ptr) { std::cout << "RAW CONSTRUCTOR\n"; }
 
-    // copy constructor
-//    template<typename U>
+    // -------- COPY CONSTRUCTORS ----------------
     shared_ptr(const shared_ptr& other) {
-//        static_assert(std::is_base_of<T, U>::value, "Will not copy pointer of different types, unless from derived type to base type.");
         std::cout << "COPY CONSTRUCTOR\n";
         _ptr = other._ptr;
         if (other._ptr != nullptr)
             (_ptr->_strong_reference_count)++;
     }
 
-    // copy assignment
-//    template<typename T2>
-    shared_ptr& operator=(const shared_ptr& other) {
-//        static_assert(std::is_base_of<T, T2>::value, "Will not copy-assign pointer of different types, unless from derived type to base type.");
-        std::cout << "COPY ASSINGMENT\n";
+    template<typename U>
+    shared_ptr(const shared_ptr<U>& other) {
+        std::cout << "COPY TEMPLATE CONSTRUCTOR\n";
+        _ptr = other._ptr;
+        if (other._ptr != nullptr)
+            (_ptr->_strong_reference_count)++;
+    }
+
+    // -------- COPY ASSIGNMENT ----------------
+    template<typename U>
+    shared_ptr& operator=(const shared_ptr<U>& other) {
+        std::cout << "COPY ASSIGNMENT\n";
         _cleanup();
         _ptr = other._ptr;
         if (other._ptr != nullptr)
@@ -78,19 +86,23 @@ public:
         return *this;
     }
 
-    // move constructor
-//    template<typename T2>
+    // -------- MOVE CONSTRUCTOR ----------------
     shared_ptr(shared_ptr&& dying_other) {
-//        static_assert(std::is_base_of<T, T2>::value, "Will not move pointer of different types, unless from derived type to base type.");
         std::cout << "MOVE CONSTRUCTOR\n";
         _ptr = dying_other._ptr;
         dying_other._ptr = nullptr;
     }
 
-    // move assignment
-//    template<typename T2>
-    shared_ptr& operator=(shared_ptr&& dying_other) {
-//        static_assert(std::is_base_of<T, T2>::value, "Will not move-assign pointer of different types, unless from derived type to base type.");
+    template<typename U>
+    shared_ptr(shared_ptr<U>&& dying_other) {
+        std::cout << "MOVE TEMPLATE CONSTRUCTOR\n";
+        _ptr = dying_other._ptr;
+        dying_other._ptr = nullptr;
+    }
+
+    // -------- MOVE ASSIGNMENT ----------------
+    template<typename U>
+    shared_ptr& operator=(shared_ptr<U>&& dying_other) {
         std::cout << "MOVE ASSIGNMENT\n";
         _cleanup();
         _ptr = dying_other._ptr;
@@ -98,16 +110,16 @@ public:
         return *this;
     }
 
-    // destructor
+    // -------- DESTRUCTOR ----------------
     ~shared_ptr() {
         std::cout << "DESTRUCTOR\n";
         _cleanup();
     }
 
-    template<typename U>
-    operator shared_ptr<U>() const {
-        return _ptr;
-    }
+//    template<typename U>
+//    operator shared_ptr<U>() const {
+//        return _ptr;
+//    }
 
     T* operator->() const {
         return _ptr;
