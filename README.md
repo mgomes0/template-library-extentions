@@ -1,4 +1,4 @@
-# Template Library Extensions
+# Standard Template Library eXtensions (STLX)
 
 The repository of template stuff that I've created more than once, so now it's here.
 
@@ -16,4 +16,19 @@ FetchContent_MakeAvailable(template-library-extensions)
 
 add_executable(my_app main.cpp)
 target_link_libraries(my_app PRIVATE tlex::tlex)
+```
+
+
+## Testing
+
+```bash
+cmake -S . -B build -DTLEX_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build
+```
+
+oneliner
+
+```bash
+cmake -S . -B build -DTLEX_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build
 ```
